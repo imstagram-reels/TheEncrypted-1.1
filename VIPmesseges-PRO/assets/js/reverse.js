@@ -1,64 +1,72 @@
-function analyze() {
-    const text = document.getElementById('Input').value.toLowerCase();
-    const letters = {
-        '----.': '1',
-        '---..': '2',
-        '--...': '3',
-        '-....': '4',
-        '.....': '5',
-        '....-': '6',
-        '...--': '7',
-        '..---': '8',
-        '.----': '9',
-        '-----': '0'
-  };
+let decodedText = "";
+    function analyze() {
+      const morseInput = document.getElementById('input').value.trim();
 
-  let dis = "";
-const regex = /([.-]{5})/g;
-  const codes = text.match(regex);
+      const morseToTextMap = {
+        '.-': 'a', '-...': 'b', '-.-.': 'c', '-..': 'd', '.': 'e',
+        '..-.': 'f', '--.': 'g', '....': 'h', '..': 'i', '.---': 'j',
+        '-.-': 'k', '.-..': 'l', '--': 'm', '-.': 'n', '---': 'o',
+        '.--.': 'p', '--.-': 'q', '.-.': 'r', '...': 's', '-': 't',
+        '..-': 'u', '...-': 'v', '.--': 'w', '-..-': 'x', '-.--': 'y',
+        '--..': 'z',
+        '.----': '1', '..---': '2', '...--': '3', '....-': '4', '.....': '5',
+        '-....': '6', '--...': '7', '---..': '8', '----.': '9', '-----': '0',
+        '/': ' ',
+        '.-.-.-': '.', '--..--': ',', '..--..': '?', '.----.': "'", '-.-.--': '!',
+        '-..-.': '/', '-.--.': '(', '-.--.-': ')', '.-...': '&', '---...': ':',
+        '-.-.-.': ';', '-...-': '=', '.-.-.': '+', '-....-': '-', '..--.-': '_',
+        '.-..-.': '"', '...-..-': '$', '.--.-.': '@'
+      };
 
-  if (!codes) {
-        dis = "#!";
-      } else {
-            for (let code of codes) {
-                  if (letters[code]) {
-                        dis += letters[code];
-                      } else if (letters === " "){
-        dis += " ";
+      let words = morseInput.split(" ");
+
+      for (let code of words) {
+        if (morseToTextMap[code]) {
+          decodedText += morseToTextMap[code];
+        } else {
+          decodedText += "#"; // رمز غير معروف
+        }
       }
-      else {
-        dis += "#!";
-      }
+
+      // document.getElementById("result").innerText = decodedText;
+      // console.log(decodedText)
+      window.analyze = analyze; // نخليها global باش onclick يقدر يناديها
     }
+
+
+// userIdInput
+// getUserBtn
+// userData
+
+
+
+const results = document.getElementById("result");
+// const userIdInput = decodedText;
+const analyzeBtn = document.getElementById("button-analyze-and-time"); // زر جديد
+
+analyzeBtn.addEventListener("click", function() {
+  const userId = decodedText.trim();
+  if (userId) {
+    getUserById(userId);
+  } else {
+    results.textContent = "⚠️ المرجو إدخال معرف المستخدم";
   }
+});
 
-  document.getElementById("result").innerHTML = dis;
+function getUserById(userId) {
+  const dbRef = ref(database);
+  get(child(dbRef, 'users/' + userId))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        const user = snapshot.val();
+        results.innerHTML = (user.input);
+      } else {
+        results.textContent = "Server error. Please try again later."
+;
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      results.textContent = "❌ حدث خطأ، تحقق من Console";
+    });
 }
-
-
-
-
-// les espase mamgadch
-// const morseMapping = {
-//   '----.': '1',
-//   '---..': '2',
-//   '--...': '3',
-//   '-....': '4',
-//   '.....': '5',
-//   '....-': '6',
-//   '...--': '7',
-//   '..---': '8',
-//   '.----': '9',
-//   '-----': '0'
-// };
-
-// function analyze() {
-//     let str = String(Date.now());
-//     let output = "";
-//     for (let char of str) {
-//         output += morseMapping[char] || '#!';
-//         output += " ";
-//     }
-//     resultDiv.innerHTML = output;
-//     return output;
-// }
